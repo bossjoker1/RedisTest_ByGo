@@ -41,13 +41,14 @@ func initClient() (err error) {
 }
 
 func main() {
-	err := initClient()
-	if err != nil {
-		//redis连接错误
-		panic(err)
-	}
+	//err := initClient()
+	//if err != nil {
+	//	//redis连接错误
+	//	panic(err)
+	//}
 	fmt.Println("Redis连接成功")
-
+	start, end := Find_Prefix_range("bachjgksi")
+	fmt.Println(start, " -- ", end)
 	////第三个参数为失效时间， 0为永久有效
 	//err = RedisDb.Set("name", "zbs", 0).Err()
 	//if err!=nil{

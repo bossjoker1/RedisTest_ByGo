@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/go-redis/redis"
 	"github.com/satori/go.uuid"
 	"log"
 	"math"
@@ -13,13 +14,14 @@ const VALID_CHARACTS string = "`abcdefghijklmnopqrstuvwxyz{"
 // 由ascii码顺序我们可以向集合添加标记符号来快速查找指定前缀所在的范围
 func Find_Prefix_range(predix string) (start string, end string) {
 	// 找到最后一个字符在valid字符串中的位置
-	posn := strings.IndexAny(predix[len(predix)-1:], VALID_CHARACTS)
-	if posn < 0 {
+	posn := strings.IndexAny(VALID_CHARACTS, predix[len(predix)-1:])
+	//fmt.Println(predix[len(predix)-1:], "index :", posn)
+	if posn <= 0 {
 		posn = 1
 	}
 	// python lamda表达式确实方便。。吐槽一波
-	str := "hello world"
-	suffix := string(str[0])
+	suffix := string(VALID_CHARACTS[posn-1])
+	//fmt.Println("suffix: ", suffix)
 	return predix[:len(predix)-1] + suffix + "{", predix + "{"
 }
 
@@ -32,6 +34,9 @@ func Auto_Complete_on_Prefix(guild, predix string) {
 	end += id
 	// 该协会的有序集合
 	zset_name := "members:" + guild
+	// 添加标记
+	RedisDb.ZAdd(zset_name, []redis.Z{{0, start}, {0, end}}...)
+
 	pipe := RedisDb.TxPipeline()
 	defer pipe.Close()
 	sindex, _ := pipe.ZRank(zset_name, start).Result()
