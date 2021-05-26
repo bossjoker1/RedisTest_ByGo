@@ -3,26 +3,10 @@ package main
 import (
 	"fmt"
 	"github.com/go-redis/redis"
-	"log"
 )
 
 // 声明一个全局的redisDb变量
 var RedisDb *redis.Client
-
-func Add_Update_Contact(user string, contact string) {
-	ac_list := "recent: " + user
-	pipe := RedisDb.TxPipeline()
-	defer pipe.Close()
-	// 执行事务操作，可以通过pipe流水线读写redis
-	pipe.LRem(ac_list, 1, contact)
-	pipe.LPush(ac_list, contact) //加在最左端
-	pipe.LTrim(ac_list, 0, 99)
-	// 通过Exec函数提交redis事务
-	_, err := pipe.Exec()
-	if err != nil {
-		log.Fatal("Transaction error: ", err)
-	}
-}
 
 // 根据redis配置初始化一个客户端
 func initClient() (err error) {

@@ -19,10 +19,25 @@ func Find_Prefix_range(predix string) (start string, end string) {
 	if posn <= 0 {
 		posn = 1
 	}
-	// python lamda表达式确实方便。。吐槽一波
+	// python lambda表达式确实方便。。吐槽一波
 	suffix := string(VALID_CHARACTS[posn-1])
 	//fmt.Println("suffix: ", suffix)
 	return predix[:len(predix)-1] + suffix + "{", predix + "{"
+}
+
+func Add_Update_Contact(user string, contact string) {
+	ac_list := "recent: " + user
+	pipe := RedisDb.TxPipeline()
+	defer pipe.Close()
+	// 执行事务操作，可以通过pipe流水线读写redis
+	pipe.LRem(ac_list, 1, contact)
+	pipe.LPush(ac_list, contact) //加在最左端
+	pipe.LTrim(ac_list, 0, 99)
+	// 通过Exec函数提交redis事务
+	_, err := pipe.Exec()
+	if err != nil {
+		log.Fatal("Transaction error: ", err)
+	}
 }
 
 // guild同一个协会的
