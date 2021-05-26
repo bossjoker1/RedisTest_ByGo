@@ -19,7 +19,7 @@ func Find_Prefix_range(predix string) (start string, end string) {
 	if posn <= 0 {
 		posn = 1
 	}
-	// python lamda表达式确实方便。。吐槽一波
+	// python lambda表达式确实方便。。吐槽一波
 	suffix := string(VALID_CHARACTS[posn-1])
 	//fmt.Println("suffix: ", suffix)
 	return predix[:len(predix)-1] + suffix + "{", predix + "{"
